@@ -9,6 +9,12 @@ def spherical_to_xyz(phi, theta, rad=1):
     y = rad * np.sin(phi) * np.sin(theta)
     z = rad * np.cos(phi)
     return x,y,z
+    
+def xyz_to_spherical(x, y, z):
+    rad = np.sqrt(x**2 + y**2 + z**2)
+    theta = np.arccos(z / rad)
+    phi = np.atan2(y, x) + pi
+    return rad, theta, phi
 
 def gen_random(npts, rng=None):
     if rng is None:
@@ -194,7 +200,17 @@ def scale_to_sphere(tris, rad=1):
 def gen_centers(polys):
     cens = [p.mean(axis=0) for p in polys]
     return cens
-        
+
+def calc_coverage_metric(xyz, n_close=10):
+    
+    cov_met = [calc_closest_dist(pt, xyz, n_close=n_close) for pt in xyz]
+    return np.array(cov_met)
+
+def calc_closest_dist(pt, pts, n_close=10):
+    dists = LA.norm(pts - pt, axis=1, ord=2)
+    inds = np.argpartition(dists, n_close)[:n_close]
+    dists_closest = dists[inds]
+    return dists_closest.mean()
 
 def plot_sphere(ax, center=(0,0,0), radius=1.0, color='cyan', alpha=0.3, resolution=30):
     phi = np.linspace(0, np.pi, resolution)
