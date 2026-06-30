@@ -114,7 +114,19 @@ def gen_regular_polygon_verticies(face_center, face_normal, n_vertex, r=1):
     
     return verts.T
 
-def subdivide_triangle(tri_xyz):
+def subdivide_triangle(tri_xyz:np.ndarray):
+    """Subdivide a triangle into 4 smaller triangles, by taking the midpoints of each side.
+
+    Parameters
+    ----------
+    tri_xyz : np.ndarray
+        The vertices of the triangle. Each row is a vertex with x,y,z. shape(3,3)
+
+    Returns
+    -------
+    list[np.ndarray]
+        The four triangles that result. List of NDArrays where each row is a vertex with x,y,z. shape(3,3)
+    """
     inds1 = [0, 1, 2]
     inds2 = [1, 2, 0]
     new_xyz = (tri_xyz[inds1] + tri_xyz[inds2]) / 2
@@ -125,7 +137,23 @@ def subdivide_triangle(tri_xyz):
     t4 = np.vstack([tri_xyz[2], new_xyz[1], new_xyz[2]])
     return [t1, t2, t3, t4]
 
-def multi_subdivide_triangle(trixyz, ndivs, output_all=False):
+def multi_subdivide_triangle(trixyz:np.ndarray, ndivs:int, output_all:bool=False):
+    """Subdivide a triangle into smaller triangles by recursively halving the sides.
+
+    Parameters
+    ----------
+    trixyz : np.ndarray
+        The vertices of the triangle shape (3,3). Each row is a vertex with x,y,z.
+    ndivs : int
+        How many times to halve the sides and produce subdivisions.
+    output_all : bool, optional
+        Output all subdivisions or just the final round (smallest triangles), by default False => only smallest output.
+
+    Returns
+    -------
+    list[np.ndarray]
+        The list of triangles, each defined by a set of three vertices.
+    """
     tris_keep = [trixyz]
     tris_walk = [trixyz]
     tot_tris = (4**(ndivs+1) - 1) / (4 - 1) # geometric sum
@@ -141,6 +169,15 @@ def multi_subdivide_triangle(trixyz, ndivs, output_all=False):
         return tris_keep[-(4**ndivs):]
 
 def get_faces_icosa():
+    """Output the sets of vertices that define the faces of an icosahedron.
+    Each face is a triangle and so has 3 vertices.
+    The global orientation of the icosahedron is as defined by the `get_vertices_icosa()` function.
+
+    Returns
+    -------
+    list[np.ndarray]
+        List of NDArrays with three xyz points each. Each row is a vertex. shape = (3,3)
+    """
     vertices = gen_vertices_icosa()
     vertmap = {i:v for i,v in enumerate(vertices)}
     faces = set()
@@ -197,16 +234,28 @@ def scale_to_sphere(tris, rad=1):
     
     return pts_sphere, pts
 
-def gen_centers(polys):
+def gen_centers(polys:list[np.ndarray]):
+    """Calculate the centroids of each polygon in the list.
+
+    Parameters
+    ----------
+    polys : list[np.ndarray]
+        Each element of the list is a NDArray that defines the polygon. shape = (n,3) with each row a vertex in x,y,z.
+
+    Returns
+    -------
+    list[np.ndarray]
+        The centroids in xyz coordinates.
+    """
     cens = [p.mean(axis=0) for p in polys]
     return cens
 
-def calc_coverage_metric(xyz, n_close=10):
+def calc_closest_distribution(xyz, n_close=10):
     
-    cov_met = [calc_closest_dist(pt, xyz, n_close=n_close) for pt in xyz]
+    cov_met = [calc_closest_distances(pt, xyz, n_close=n_close) for pt in xyz]
     return np.array(cov_met)
 
-def calc_closest_dist(pt, pts, n_close=10):
+def calc_closest_distances(pt, pts, n_close=10):
     dists = LA.norm(pts - pt, axis=1, ord=2)
     inds = np.argpartition(dists, n_close)[:n_close]
     dists_closest = dists[inds]

@@ -38,7 +38,7 @@ if __name__ == '__main__':
         [-1/2, -1/(2*np.sqrt(3)), 0],
         [0, 1/np.sqrt(3), 0],
     ])
-    ndivs = 4
+    ndivs = 2
     out_all_triangles = False
     tris = sc.multi_subdivide_triangle(xyz, ndivs=ndivs, output_all=out_all_triangles)
     
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     nend = -1
     nstep = 1
 
-    coverage_verts = sc.calc_coverage_metric(pts, n_close=5)
-    coverage_cens = sc.calc_coverage_metric(pts_cen, n_close=5)
+    coverage_verts = sc.calc_closest_distribution(pts, n_close=5)
+    coverage_cens = sc.calc_closest_distribution(pts_cen, n_close=5)
 
     plot_polyhedron_flag = True
     plot_polyhedron_flag = False 
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     # plot_angles_flag = False 
     if plot_angles_flag:
         fig_ang, ax = plt.subplots(1,1)
-        ax.scatter(phi, th, c='tab:blue', s=12)
+        # ax.scatter(phi, th, c='tab:blue', s=12)
         ax.scatter(phic, thc, c='tab:red', s=12, marker='x')
 
         axkwargs = {
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     # plot_covhist_flag = False 
     if plot_covhist_flag:
         fig, ax = plt.subplots(1,1)
-        bins = np.arange(0,1,0.1)
+        bins = np.arange(0,0.5,0.05)
         ax.hist(coverage_verts, bins=bins, color="tab:blue", alpha=0.7)
         ax.hist(coverage_cens, bins=bins, color="tab:red", alpha=0.7)
 
