@@ -38,7 +38,7 @@ if __name__ == '__main__':
         [-1/2, -1/(2*np.sqrt(3)), 0],
         [0, 1/np.sqrt(3), 0],
     ])
-    ndivs = 2
+    ndivs = 3
     out_all_triangles = False
     tris = sc.multi_subdivide_triangle(xyz, ndivs=ndivs, output_all=out_all_triangles)
     
@@ -55,6 +55,9 @@ if __name__ == '__main__':
     pts_sphere_centers, pts_cen = sc.scale_to_sphere(centers)
     print(f'# of centers = {pts_cen.shape[0]}')
     
+    xgold, ygold, zgold = sc.gen_golden_spiral(pts_cen.shape[0])
+    pts_sphere_golden = np.vstack([xgold, ygold, zgold]).T
+
     plot_flattri_flag = True
     plot_flattri_flag = False 
     if plot_flattri_flag:
@@ -78,12 +81,15 @@ if __name__ == '__main__':
 
     print(f"# of base faces {len(polys)}")
 
-    nstart = 0
-    nend = -1
-    nstep = 1
+    
 
     coverage_verts = sc.calc_closest_distribution(pts, n_close=5)
     coverage_cens = sc.calc_closest_distribution(pts_cen, n_close=5)
+    coverage_gold = sc.calc_closest_distribution(pts_sphere_golden, n_close=5)
+
+    nstart = 0
+    nend = -1
+    nstep = 1
 
     plot_polyhedron_flag = True
     plot_polyhedron_flag = False 
@@ -108,15 +114,17 @@ if __name__ == '__main__':
         x = pts[nstart:nend:nstep,0]
         y = pts[nstart:nend:nstep,1]
         z = pts[nstart:nend:nstep,2]
-        ax.scatter(x,y,z, color='black', s=12, depthshade=False)
+        ax.scatter(x,y,z, color='tab:blue', s=12, depthshade=False)
         x = pts_cen[nstart:nend:nstep,0]
         y = pts_cen[nstart:nend:nstep,1]
         z = pts_cen[nstart:nend:nstep,2]
-        ax.scatter(x,y,z, color='red', s=12, depthshade=False)
+        ax.scatter(x,y,z, color='tab:green', s=12, depthshade=False)
 
 
         ax.set(**axkwargs)
 
+
+    
     x = pts[nstart:nend:nstep, 0]
     y = pts[nstart:nend:nstep, 1]
     z = pts[nstart:nend:nstep, 2]
@@ -125,13 +133,15 @@ if __name__ == '__main__':
     y = pts_cen[nstart:nend:nstep, 1]
     z = pts_cen[nstart:nend:nstep, 2]
     rc, thc, phic = sc.xyz_to_spherical(x, y, z)
+    rg, thg, phig = sc.xyz_to_spherical(xgold, ygold, zgold)
 
     plot_angles_flag = True
     # plot_angles_flag = False 
     if plot_angles_flag:
         fig_ang, ax = plt.subplots(1,1)
         # ax.scatter(phi, th, c='tab:blue', s=12)
-        ax.scatter(phic, thc, c='tab:red', s=12, marker='x')
+        ax.scatter(phic, thc, c='tab:green', s=15, marker='x')
+        ax.scatter(phig, thg, c='tab:orange', s=15, marker='d')
 
         axkwargs = {
             'xlim':[0, 2*pi],
@@ -150,7 +160,8 @@ if __name__ == '__main__':
         fig_sphere = plt.figure()
         ax = fig_sphere.add_subplot(111, projection='3d')
         ax.scatter(pts_sphere[:,0], pts_sphere[:,1], pts_sphere[:,2], color='tab:blue', s=12, depthshade=True)
-        ax.scatter(pts_sphere_centers[:,0], pts_sphere_centers[:,1], pts_sphere_centers[:,2], color='tab:red', s=12, marker='x', depthshade=True)
+        ax.scatter(pts_sphere_centers[:,0], pts_sphere_centers[:,1], pts_sphere_centers[:,2], color='tab:green', s=12, marker='x', depthshade=True)
+        ax.scatter(pts_sphere_golden[:,0], pts_sphere_golden[:,1], pts_sphere_golden[:,2], color='gold', s=12, marker='d', depthshade=True)
         plot_sphere(ax, center=(0,0,0), radius=0.95, color='grey', alpha=1)
         axkwargs = {
             
@@ -167,7 +178,8 @@ if __name__ == '__main__':
         fig, ax = plt.subplots(1,1)
         bins = np.arange(0,0.5,0.05)
         ax.hist(coverage_verts, bins=bins, color="tab:blue", alpha=0.7)
-        ax.hist(coverage_cens, bins=bins, color="tab:red", alpha=0.7)
+        ax.hist(coverage_cens, bins=bins, color="tab:green", alpha=0.7)
+        ax.hist(coverage_gold, bins=bins, color="tab:orange", alpha=0.7)
 
 
     plt.show(block=False)

@@ -36,6 +36,16 @@ def gen_anglegrid(npts):
     theta_mesh = np.reshape(theta_mesh, [-1, ])
     return spherical_to_xyz(phi_mesh, theta_mesh)
     
+def gen_golden_spiral(npts:int):
+    x = np.array([i/golden - int(i/golden) for i in range(npts)])
+    y = np.array([i/npts for i in range(npts)])
+
+    phi = 2*pi*x
+    theta = np.arccos(1 - 2*y)
+    return spherical_to_xyz(phi, theta, rad=1)
+     
+
+
 def gen_vertices_dodeca():
     ones = np.array([
         [1, 1, 1],
