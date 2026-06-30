@@ -40,8 +40,8 @@ def gen_golden_spiral(npts:int):
     x = np.array([i/golden - int(i/golden) for i in range(npts)])
     y = np.array([i/npts for i in range(npts)])
 
-    phi = 2*pi*x
-    theta = np.arccos(1 - 2*y)
+    theta = 2*pi*x
+    phi = np.arccos(1 - 2*y)
     return spherical_to_xyz(phi, theta, rad=1)
      
 
