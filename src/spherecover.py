@@ -37,6 +37,16 @@ def gen_anglegrid(npts):
     return spherical_to_xyz(phi_mesh, theta_mesh)
     
 def gen_golden_spiral(npts:int):
+    """from: https://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
+
+    Parameters
+    ----------
+    npts : int
+
+    Returns
+    -------
+    x,y,z - np.ndarrays
+    """
     x = np.array([i/golden - int(i/golden) for i in range(npts)])
     y = np.array([i/npts for i in range(npts)])
 
